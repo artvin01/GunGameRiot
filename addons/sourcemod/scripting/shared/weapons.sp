@@ -529,8 +529,53 @@ void Weapons_ApplyAttribs(int client)
 enum struct WeaponInfo
 {
 	int InternalWeaponID;
+	float ScoreSave;
 }
+static ArrayList WeaponListRound;
 void Weapons_ResetRound()
 {
-	Cvar_GGR_WeaponsTillWin.IntValue;
+	if(WeaponListRound)
+		delete WeaponListRound;
+	
+	WeaponListRound = new ArrayList(sizeof(WeaponListRound));
+	
+
+	int length = WeaponList.Length;
+
+		
+	int WeaponsPick;
+	int[] WeaponsPicking = new int[length];
+
+	for(int i; i<length; i++)
+	{
+		if(i == 0)
+			continue;
+		//Pick up All weapons
+		WeaponsPicking[WeaponsPick++] = i;
+	}
+
+	SortIntegers(WeaponsPicking, length, Sort_Random);
+	
+	int MaxWeapons = Cvar_GGR_WeaponsTillWin.IntValue;
+	if(MaxWeapons > length)
+		MaxWeapons = length -1;
+	WeaponInfo Weplist;
+	ItemInfo info;
+	for(int i; i<MaxWeapons; i++)
+	{
+		Weplist.InternalWeaponID = WeaponsPicking[i];
+		WeaponList.GetArray(WeaponsPicking[i], info);
+		Weplist.ScoreSave = info.WeaponScore;
+		
+		WeaponListRound.PushArray(Weplist);
+	}
+	WeaponListRound.SortCustom(SortMenuOptions);
+}
+public int SortMenuOptions(int iIndex1, int iIndex2, Handle hMap, Handle hHandle)
+{
+    char sName1[128], sName2[128];
+    GetArrayString(hMap, iIndex1, sName1, 128, WeaponInfo::ScoreSave);
+    GetArrayString(hMap, iIndex2, sName2, 128, WeaponInfo::ScoreSave);
+    
+    return strcmp(sName1, sName2, false);
 }
