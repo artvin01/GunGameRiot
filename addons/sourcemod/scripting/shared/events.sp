@@ -93,3 +93,19 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
 	Weapons_ResetRound();
 }
+
+void OnTFPlayerManagerThinkPost(int entity)
+{
+	static int scoreOffset = -1;
+	if (scoreOffset == -1)
+		scoreOffset = FindSendPropInfo("CTFPlayerResource", "m_iTotalScore");
+	
+	int playerScores[MAXPLAYERS + 1];
+	for (int client = 1; client <= MaxClients; client++)
+	{
+		if (IsValidClient(client))
+			playerScores[client] = ClientAtWhatScore[client];
+	}
+	
+	SetEntDataArray(entity, scoreOffset, playerScores, MaxClients + 1);
+}

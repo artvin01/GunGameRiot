@@ -150,6 +150,10 @@ public void OnEntityCreated(int entity, const char[] classname)
 		b_IsATrigger[entity] = true;
 		b_IsATriggerHurt[entity] = true;
 	}
+	else if (StrEqual(classname, "tf_player_manager"))
+	{
+		SDKHook(entity, SDKHook_ThinkPost, OnTFPlayerManagerThinkPost);	
+	}
 }
 
 public void OnEntityDestroyed(int entity)
