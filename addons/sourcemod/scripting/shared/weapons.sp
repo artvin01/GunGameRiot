@@ -569,13 +569,14 @@ void Weapons_ResetRound()
 		
 		WeaponListRound.PushArray(Weplist);
 	}
-	WeaponListRound.SortCustom(SortMenuOptions);
+	WeaponListRound.SortCustom(SortScoresWeapons);
+
+
 }
-public int SortMenuOptions(int iIndex1, int iIndex2, Handle hMap, Handle hHandle)
+public int SortScoresWeapons(int iIndex1, int iIndex2, Handle hMap, Handle hHandle)
 {
-    char sName1[128], sName2[128];
-    GetArrayString(hMap, iIndex1, sName1, 128, WeaponInfo::ScoreSave);
-    GetArrayString(hMap, iIndex2, sName2, 128, WeaponInfo::ScoreSave);
+    float Score1 = GetArrayCell(hMap, iIndex1, WeaponInfo::ScoreSave);
+    float Score2 = GetArrayCell(hMap, iIndex2, WeaponInfo::ScoreSave);
     
-    return strcmp(sName1, sName2, false);
+    return (Score1 < Score2);
 }
