@@ -20,7 +20,7 @@ void ConVar_PluginStart()
 	CvarList = new ArrayList(sizeof(CvarInfo));
 
 	sv_cheats = ConVar_Add("sv_cheats", "0", false, (FCVAR_NOTIFY | FCVAR_REPLICATED | FCVAR_CHEAT));
-	mp_friendlyfire = ConVar_Add("mp_friendlyfire", "0", false, (FCVAR_NOTIFY | FCVAR_REPLICATED | FCVAR_CHEAT));
+	mp_friendlyfire = ConVar_Add("mp_friendlyfire", "1", false, (FCVAR_NOTIFY | FCVAR_REPLICATED | FCVAR_CHEAT));
 	tf_scout_air_dash_count = ConVar_Add("tf_scout_air_dash_count", "0", false); 
 
 	Cvar_GGR_WeaponsTillWin = CreateConVar("ggr_weapons_till_win", "25", "How many kills untill a player wins");

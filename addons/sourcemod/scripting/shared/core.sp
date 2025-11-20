@@ -70,6 +70,7 @@
 #include "weapons/weapon_default_wand.sp"
 #include "weapons/weapon_ant_jar.sp"
 #include "weapons/weapon_builder.sp"
+#include "weapons/weapon_wand_gravaton.sp"
 
 public Plugin myinfo =
 {
@@ -124,6 +125,10 @@ public void OnMapStart()
 	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.dx90.vtx");
 	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.mdl");
 	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.vvd");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/ruina_models_1_2_2.dx80.vtx");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/ruina_models_1_2_2.dx90.vtx");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/ruina_models_1_2_2.mdl");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/ruina_models_1_2_2.vvd");
 	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.dx80.vtx");
 	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.dx90.vtx");
 	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.mdl");
@@ -143,6 +148,7 @@ public void OnMapStart()
 	KahmlFistMapStart();
 	WandStocks_Map_Precache();
 	Wand_Map_Precache();
+	Gravaton_Wand_MapStart();
 }
 
 public void OnConfigsExecuted()

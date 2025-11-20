@@ -1136,3 +1136,187 @@ void ForceTeamWin(TFTeam team)
 	if (shouldDelete)
 		RemoveEntity(entity);
 }
+
+
+
+public bool BulletAndMeleeTrace(int entity, int contentsMask, any iExclude)
+{
+	if(entity == iExclude)
+		return false;
+
+	if(b_ThisEntityIsAProjectileForUpdateContraints[entity])
+	{
+		return false;
+	}
+	
+	if(IsValidEnemy(iExclude, entity, true, true))
+		return !(entity == iExclude);
+
+	return !(entity == iExclude);
+}
+
+
+public void MakeExplosionFrameLater(DataPack pack)
+{
+	pack.Reset();
+	float vec_pos[3];
+	vec_pos[0] = pack.ReadFloat();
+	vec_pos[1] = pack.ReadFloat();
+	vec_pos[2] = pack.ReadFloat();
+	int Do_Sound = pack.ReadCell();
+	
+	int ent = CreateEntityByName("env_explosion");
+	if(ent != -1)
+	{
+	//	SetEntPropEnt(ent, Prop_Data, "m_hOwnerEntity", client);
+		
+		if(Do_Sound == 1)
+		{		
+			EmitAmbientSound("ambient/explosions/explode_3.wav", vec_pos, _, 75, _,0.7, GetRandomInt(75, 110));
+		}
+		
+		DispatchKeyValueVector(ent, "origin", vec_pos);
+		DispatchKeyValue(ent, "spawnflags", "581");
+						
+		DispatchKeyValue(ent, "rendermode", "0");
+		DispatchKeyValue(ent, "fireballsprite", "spirites/zerogxplode.spr");
+										
+		DispatchKeyValueFloat(ent, "DamageForce", 0.0);								
+		SetEntProp(ent, Prop_Data, "m_iMagnitude", 0); 
+		SetEntProp(ent, Prop_Data, "m_iRadiusOverride", 0); 
+									
+		DispatchSpawn(ent);
+		ActivateEntity(ent);
+									
+		AcceptEntityInput(ent, "explode");
+		AcceptEntityInput(ent, "kill");
+	}		
+	SpawnSmallExplosionNotRandom(vec_pos);
+	delete pack;
+}
+
+stock void CreateExplosion(int owner, const float origin[3], float damage, int magnitude, int radius)
+{
+	int explosion = CreateEntityByName("env_explosion");
+	if(IsValidEntity(explosion))
+	{
+		DispatchKeyValueFloat(explosion, "DamageForce", damage);
+		
+		SetEntProp(explosion, Prop_Data, "m_iMagnitude", magnitude);
+		SetEntProp(explosion, Prop_Data, "m_iRadiusOverride", radius);
+		SetEntPropEnt(explosion, Prop_Data, "m_hOwnerEntity", owner);
+		
+		if(DispatchSpawn(explosion))
+		{
+			TeleportEntity(explosion, origin, NULL_VECTOR, NULL_VECTOR);
+			AcceptEntityInput(explosion, "Explode");
+			RemoveEntity(explosion);
+		}
+	}
+}
+
+
+#define EXPLOSION_PARTICLE_SMALL_1 "ExplosionCore_MidAir"
+#define EXPLOSION_PARTICLE_SMALL_2 "ExplosionCore_buildings"
+#define EXPLOSION_PARTICLE_SMALL_3 "ExplosionCore_Wall"
+#define EXPLOSION_PARTICLE_SMALL_4 "rd_robot_explosion"
+
+public void SpawnSmallExplosion(float DetLoc[3])
+{
+	float pos[3];
+	pos[0] += DetLoc[0] + GetRandomFloat(-25.0, 25.0);
+	pos[1] += DetLoc[1] + GetRandomFloat(-25.0, 25.0);
+	pos[2] += DetLoc[2] + GetRandomFloat(0.0, 25.0);
+	
+	TE_Particle(EXPLOSION_PARTICLE_SMALL_1, pos, NULL_VECTOR, NULL_VECTOR, _, _, _, _, _, _, _, _, _, _, 0.0);
+}
+
+public void SpawnSmallExplosionNotRandom(float DetLoc[3])
+{
+	TE_Particle(EXPLOSION_PARTICLE_SMALL_1, DetLoc, NULL_VECTOR, NULL_VECTOR, _, _, _, _, _, _, _, _, _, _, 0.0);
+}
+
+
+
+stock void TE_Particle(const char[] Name, float origin[3]=NULL_VECTOR, float start[3]=NULL_VECTOR, float angles[3]=NULL_VECTOR, int entindex=-1, int attachtype= 0, int attachpoint=-1, bool resetParticles=true, int customcolors=0, float color1[3]=NULL_VECTOR, float color2[3]=NULL_VECTOR, int controlpoint=-1, int controlpointattachment=-1, float controlpointoffset[3]=NULL_VECTOR, float delay=0.0, int clientspec = 0)
+{
+	// find string table
+	int tblidx = FindStringTable("ParticleEffectNames");
+	if (tblidx == INVALID_STRING_TABLE)
+	{
+//		LogError2("[Plugin] Could not find string table: ParticleEffectNames");
+		return;
+	}
+
+	// find particle index
+	static char tmp[256];
+	int count = GetStringTableNumStrings(tblidx);
+	int stridx = INVALID_STRING_INDEX;
+	for(int i; i<count; i++)
+	{
+		ReadStringTable(tblidx, i, tmp, sizeof(tmp));
+		if(StrEqual(tmp, Name, false))
+		{
+			stridx = i;
+			break;
+		}
+	}
+
+	if(stridx == INVALID_STRING_INDEX)
+	{
+//		LogError2("[Boss] Could not find particle: %s", Name);
+		return;
+	}
+	
+	TE_Start("TFParticleEffect");
+	TE_WriteFloat("m_vecOrigin[0]", origin[0]);
+	TE_WriteFloat("m_vecOrigin[1]", origin[1]);
+	TE_WriteFloat("m_vecOrigin[2]", origin[2]);
+	TE_WriteFloat("m_vecStart[0]", start[0]);
+	TE_WriteFloat("m_vecStart[1]", start[1]);
+	TE_WriteFloat("m_vecStart[2]", start[2]);
+	TE_WriteVector("m_vecAngles", angles);
+	TE_WriteNum("m_iParticleSystemIndex", stridx);
+
+//must include -1, or else it freaks out!!!!
+//	if(entindex != -1)
+	TE_WriteNum("entindex", entindex);
+
+	if(attachtype != -1)
+		TE_WriteNum("m_iAttachType", attachtype);
+
+	if(attachpoint != -1)
+		TE_WriteNum("m_iAttachmentPointIndex", attachpoint);
+
+	TE_WriteNum("m_bResetParticles", resetParticles ? 1:0);
+	if(customcolors)
+	{
+		TE_WriteNum("m_bCustomColors", customcolors);
+		if(color1[2] == 11.1) //This shit doesnt work and spams console, block.
+		{
+			TE_WriteVector("m_CustomColors.m_vecColor1", color1);
+			if(customcolors == 2)
+				TE_WriteVector("m_CustomColors.m_vecColor2", color2);
+			
+		}
+	}
+
+	if(controlpoint != -1)
+	{
+		TE_WriteNum("m_bControlPoint1", controlpoint);
+		if(controlpointattachment != -1)
+		{
+			TE_WriteNum("m_ControlPoint1.m_eParticleAttachment", controlpointattachment);
+			TE_WriteFloat("m_ControlPoint1.m_vecOffset[0]", controlpointoffset[0]);
+			TE_WriteFloat("m_ControlPoint1.m_vecOffset[1]", controlpointoffset[1]);
+			TE_WriteFloat("m_ControlPoint1.m_vecOffset[2]", controlpointoffset[2]);
+		}
+	}
+
+	if(clientspec == 0)
+		TE_SendToAll(delay);
+	else
+	{
+		TE_SendToClient(clientspec, delay);
+	}
+}
