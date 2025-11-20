@@ -366,6 +366,9 @@ stock int Target_Hit_Wand_Detection(int owner_projectile, int other_entity)
 	{
 		return -1; //I dont exist?
 	}
+	int owner = EntRefToEntIndex(i_WandOwner[owner_projectile]);
+	if(owner == other_entity)
+		return -1;
 	if(other_entity < 0)
 	{
 		return -1; //I dont exist?
@@ -380,10 +383,6 @@ stock int Target_Hit_Wand_Detection(int owner_projectile, int other_entity)
 	}
 	else if(IsValidEnemy(owner_projectile, other_entity, true, true))
 	{
-		int owner = EntRefToEntIndex(i_WandOwner[owner_projectile]);
-		if(owner == other_entity)
-			return -1;
-
 		
 		return other_entity;
 	}

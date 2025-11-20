@@ -614,6 +614,24 @@ void GiveClientWeapon(int client, int Upgrade = 0)
 	if (Upgrade >= 1)
 		EmitSoundToClient(client, SOUND_LEVELUP, _, SNDCHAN_STATIC, SNDLEVEL_NONE);
 	
+	if(GiveWeapon + 4 >= Cvar_GGR_WeaponsTillWin.IntValue)
+	{
+		SetEntProp(client, Prop_Send, "m_bGlowEnabled", true);
+	}
+	else
+	{
+		SetEntProp(client, Prop_Send, "m_bGlowEnabled", false);
+	}
+	if(GiveWeapon + 1 >= Cvar_GGR_WeaponsTillWin.IntValue)
+	{
+		SetEntProp(client, Prop_Send, "m_bGlowEnabled", true);
+		if(Upgrade >= 1)
+		{
+			TF2_AddCondition(client, TFCond_MarkedForDeath, 9999.9);
+			CPrintToChatAll("%s %N is about to win!",GGR_PREFIX, client);
+		}
+	}
+
 	WeaponInfo Weplist;
 	WeaponListRound.GetArray(GiveWeapon, Weplist);
 	
@@ -623,6 +641,8 @@ void GiveClientWeapon(int client, int Upgrade = 0)
 	SDKCall_GiveCorrectAmmoCount(client);
 	RequestFrames(GiveHealth, 1, GetClientUserId(client));
 	SetPlayerActiveWeapon(client, weapon);
+
+
 }
 
 

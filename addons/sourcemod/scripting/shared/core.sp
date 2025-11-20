@@ -116,6 +116,25 @@ public void OnMapStart()
 	PrecacheSound("zombiesurvival/headshot2.wav");
 	PrecacheSound("quake/standard/headshot.mp3");
 	PrecacheSound(SOUND_LEVELUP);
+	AddFileToDownloadsTable("zombiesurvival/headshot1.wav");
+	AddFileToDownloadsTable("zombiesurvival/headshot2.wav");
+	AddFileToDownloadsTable("quake/standard/headshot.mp3");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.dx80.vtx");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.dx90.vtx");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.mdl");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/custom_weaponry_1_52.vvd");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.dx80.vtx");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.dx90.vtx");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.mdl");
+	AddFileToDownloadsTable("models/zombie_riot/weapons/c_soldier_arms.vvd");
+	AddFileToDownloadsTable("materials/models/weapons/custom_weaponry.vtf");
+	AddFileToDownloadsTable("materials/models/weapons/blue.vmt");
+	AddFileToDownloadsTable("materials/models/weapons/blue_test_2.vmt");
+	AddFileToDownloadsTable("materials/models/weapons/glow_inner_2.vmt");
+	AddFileToDownloadsTable("materials/models/weapons/glow_inner.vmt");
+	AddFileToDownloadsTable("materials/models/weapons/weaponry_solid_white.vtf");
+	AddFileToDownloadsTable("materials/models/weapons/weaponry_solid_white_2.vtf");
+	AddFileToDownloadsTable("materials/models/weapons/weaponry_trans_white_2.vtf");
 
 	Zero(h_NpcSolidHookType);
 	Weapon_Arrow_Shoot_Map_Precache();

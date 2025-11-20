@@ -76,7 +76,8 @@ public Action Player_TraceAttack(int victim, int& attacker, int& inflictor, floa
 		
 	if(inflictor < 1 || inflictor > MaxClients)
 		return Plugin_Continue;
-
+	if(!IsValidEnemy(attacker, victim, true, true))
+		return Plugin_Continue;
 	i_HasBeenHeadShotted[victim] = false;
 	
 	int weapon = GetEntPropEnt(attacker, Prop_Send, "m_hActiveWeapon");
