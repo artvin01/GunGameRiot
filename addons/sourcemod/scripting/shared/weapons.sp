@@ -368,15 +368,20 @@ int Weapons_GiveItem(int client, int index, bool &use=false, bool &found=false)
 		Function func = EntityFuncReloadCreate[entity];
 		if(func && func!=INVALID_FUNCTION)
 		{
-			int slot = 1;
 			Call_StartFunction(null, func);
 			Call_PushCell(client);
 			Call_PushCell(entity);
+			Call_Finish();
 		}
 	}
 
 	ViewChange_PlayerModel(client);
 	ViewChange_Update(client);
+
+	Event event = CreateEvent("localplayer_pickup_weapon", true);
+	event.FireToClient(client);
+	event.Cancel();
+
 	return entity;
 }
 
@@ -632,6 +637,27 @@ void GiveClientWeapon(int client, int Upgrade = 0)
 		}
 	}
 
+	int entity = MaxClients + 1;
+	while((entity = FindEntityByClassname(entity, "obj_*")) != -1)
+	{
+		if(GetEntPropEnt(entity, Prop_Send, "m_hBuilder") == client)
+		{
+			FakeClientCommand(client, "destroy %d", GetEntProp(entity, Prop_Send, "m_iObjectType"));
+			AcceptEntityInput(entity, "kill");
+		}
+	}
+
+	if(Upgrade)
+	{
+		while((entity = FindEntityByClassname(entity, "tf_projectile_*")) != -1)
+		{
+			if(GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity") == client)
+			{
+				AcceptEntityInput(entity, "kill");
+			}
+		}
+	}
+
 	WeaponInfo Weplist;
 	WeaponListRound.GetArray(GiveWeapon, Weplist);
 	
@@ -641,8 +667,6 @@ void GiveClientWeapon(int client, int Upgrade = 0)
 	SDKCall_GiveCorrectAmmoCount(client);
 	RequestFrames(GiveHealth, 1, GetClientUserId(client));
 	SetPlayerActiveWeapon(client, weapon);
-
-
 }
 
 

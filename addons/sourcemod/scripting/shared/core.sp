@@ -69,6 +69,7 @@
 #include "weapons/weapon_arrow_shot.sp"
 #include "weapons/weapon_default_wand.sp"
 #include "weapons/weapon_ant_jar.sp"
+#include "weapons/weapon_builder.sp"
 
 public Plugin myinfo =
 {
@@ -205,6 +206,24 @@ public void OnEntityCreated(int entity, const char[] classname)
 	{
 		SDKHook(entity, SDKHook_ThinkPost, OnTFPlayerManagerThinkPost);	
 	}
+	else if(!StrContains(classname, "item_healthkit_medium"))
+	{
+		SDKHook(entity, SDKHook_Touch, SandvichTouch);
+	}
+}
+
+static Action SandvichTouch(int entity, int target)
+{
+	if(target < 1 || target > MaxClients)
+		return Plugin_Continue;
+	
+	int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
+	if(client < 1 || client > MaxClients || client == target)
+		return Plugin_Continue;
+	
+	RemoveEntity(entity);
+	SDKHooks_TakeDamage(target, client, client, 4200.0, DMG_PREVENT_PHYSICS_FORCE, _, {0.0, 0.0, 0.0});
+	return Plugin_Handled;
 }
 
 public void OnEntityDestroyed(int entity)
@@ -294,6 +313,7 @@ public Action Command_ForceGiveGunName(int client, int args)
 	
 	for(int target; target<matches; target++)
 	{
+		RemoveAllWeapons(targets[target]);
 		int weapon = Weapons_GiveSpecificItem(targets[target], buf);
 		OnWeaponSwitchPost(targets[target] , weapon);
 	}

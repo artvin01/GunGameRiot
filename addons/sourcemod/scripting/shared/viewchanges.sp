@@ -5,7 +5,7 @@
 
 static const char HandModels[][] =
 {
-	"models/empty.mdl",
+	"models/weapons/c_models/c_engineer_gunslinger.mdl",
 	"models/weapons/c_models/c_scout_arms.mdl",
 	"models/weapons/c_models/c_sniper_arms.mdl",
 	"models/zombie_riot/weapons/soldier_hands/c_soldier_arms.mdl", //needed custom model due to rocket in face.
