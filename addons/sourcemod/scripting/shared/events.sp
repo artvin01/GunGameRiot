@@ -28,7 +28,7 @@ public Action OnPlayerDeath(Event event, const char[] name, bool dontBroadcast)
 			EmitSoundToClient(attacker, "quake/standard/headshot.mp3", _, _, 90, _, 1.0, 100);
 		}
 		
-		if(ClientAtWhatScore[attacker] >= Cvar_GGR_WeaponsTillWin.IntValue)
+		if(ClientAtWhatScore[attacker] >= Cvar_GGR_WeaponsTillWin.IntValue && GameRules_GetRoundState() == RoundState_RoundRunning)
 		{
 			//epic win
 			ClientAtWhatScore[attacker] = Cvar_GGR_WeaponsTillWin.IntValue;
@@ -107,10 +107,17 @@ public void OnRoundStart(Event event, const char[] name, bool dontBroadcast)
 {
 	Weapons_ResetRound();
 	
+	const float flFreezeTime = 5.0;
+	float gameTime = GetGameTime();
+	f_RoundStartUberLastsUntil = gameTime + flFreezeTime + 1.0;
+	
 	for (int client = 1; client <= MaxClients; client++)
 	{
 		if (IsValidClient(client) && IsPlayerAlive(client))
+		{
 			GiveClientWeapon(client, 0);
+			TF2_AddCondition(client, TFCond_UberchargedCanteen, f_RoundStartUberLastsUntil - gameTime);
+		}
 	}
 }
 

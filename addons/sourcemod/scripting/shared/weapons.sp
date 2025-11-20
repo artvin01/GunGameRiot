@@ -600,6 +600,9 @@ void GiveClientWeapon(int client, int Upgrade = 0)
 	if(GiveWeapon >= Cvar_GGR_WeaponsTillWin.IntValue)
 		return;
 	
+	if (Upgrade >= 1)
+		EmitSoundToClient(client, SOUND_LEVELUP, _, SNDCHAN_STATIC, SNDLEVEL_NONE);
+	
 	WeaponInfo Weplist;
 	WeaponListRound.GetArray(GiveWeapon, Weplist);
 	

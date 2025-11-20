@@ -28,6 +28,7 @@ int m_bOnlyIterateItemViewAttributes;
 int m_Item;
 bool IsInsideManageRegularWeapons;
 int iref_PropAppliedToRocket[MAXENTITIES];
+float f_RoundStartUberLastsUntil;
 
 ConVar tf_scout_air_dash_count;
 
