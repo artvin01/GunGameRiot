@@ -234,6 +234,10 @@ public void OnEntityCreated(int entity, const char[] classname)
 	{
 		b_IsAMedigun[entity] = true;
 	}
+	else if (!StrContains(classname, "tf_ammo_pack")) 
+	{
+		SDKHook(entity, SDKHook_SpawnPost, Delete_instantly);
+	}
 	else if(!StrContains(classname, "tf_projecti"))
 	{
 		//This can only be on red anyways.
@@ -296,6 +300,10 @@ void Core_DoTickrateChanges()
 	TickrateModify = tickrate / 66.0;
 }
 
+public void Delete_instantly(int entity)
+{
+	RemoveEntity(entity);
+}
 
 
 

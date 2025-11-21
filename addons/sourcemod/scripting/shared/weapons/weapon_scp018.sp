@@ -217,14 +217,15 @@ public void SCP18_Tick()
 		{
 			TR_GetEndPosition(hitposition);
 			TR_GetPlaneNormal(INVALID_HANDLE, hitnormal);
-			
+			/*
 			// disappear if we hit the sky
 			if (TR_GetSurfaceFlags() & SURF_SKY)
 			{
 				AcceptEntityInput(scp18.EntIndex, "Kill");
 				SCP18List.Erase(i);
 				continue;
-			}		
+			}
+			*/		
 					
 			// calculate reflection from the hit point
 			SubtractVectors(nextposition, position, direction);
