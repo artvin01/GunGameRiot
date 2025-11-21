@@ -168,6 +168,7 @@ public void OnMapStart()
 	Wand_Map_Precache();
 	Gravaton_Wand_MapStart();
 	VehicularManslaughter_Precache();
+	BonkBat_MapStart();
 }
 
 public void OnConfigsExecuted()
