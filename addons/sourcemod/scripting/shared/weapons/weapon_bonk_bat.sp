@@ -58,6 +58,8 @@ public Action BonkBat_OnTakeDamage(int victim, int &attacker, int &inflictor, fl
         // victim.EmitSound(bat_hit_sound)
         GetClientAbsOrigin(victim, origin);
         EmitAmbientSound(BonkBat_Sound, origin, victim, 255, _, 1.0, 100, 0.0);
+        
+        return Plugin_Handled;
     }
     
     return Plugin_Continue;
