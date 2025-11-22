@@ -32,6 +32,11 @@ public Action BonkBat_OnTakeDamage(int victim, int &attacker, int &inflictor, fl
 {
     if(victim != -1 && attacker != -1 && (damagetype & DMG_CLUB))
     {
+        if(damage > 0.0)
+        {
+            EmitSoundToAll(BonkBat_Sound, victim, SNDCHAN_ITEM, 70, _, 1.0);
+        }
+        
         damage = 1.0;
         
         // unground
@@ -42,26 +47,28 @@ public Action BonkBat_OnTakeDamage(int victim, int &attacker, int &inflictor, fl
         
         // local scale = 450.0
         float scale = 450.0;
-        // local dir = attacker.EyeAngles().Forward()
-        float eyeangles[3], dir[3], vel[3], origin[3];
-        GetClientEyeAngles(attacker, eyeangles);
-        GetAngleVectors(eyeangles, dir, NULL_VECTOR, NULL_VECTOR);
-        // local vel = victim.GetAbsVelocity()
-        GetEntPropVector(victim, Prop_Data, "m_vecVelocity", vel); 
-        // dir.z = Max(dir.z, 0.0)
-        dir[2] = BonkBat_Max(dir[2], 0.0);
-        // vel += dir * scale
-        ScaleVector(dir, scale);
         
-        float final_vel[3];
-        AddVectors(vel, dir, final_vel);
-        // vel.z += scale
-        final_vel[2] += scale;
-        // victim.SetAbsVelocity(vel)
-        Custom_SetAbsVelocity(victim, vel);				
-        // victim.EmitSound(bat_hit_sound)
-        GetClientAbsOrigin(victim, origin);
-        EmitSoundToAll(BonkBat_Sound, victim, SNDCHAN_ITEM, 70, _, 1.0);
+        ScaleVector(damageForce, scale);
+        
+        // // local dir = attacker.EyeAngles().Forward()
+        // float eyeangles[3], dir[3], vel[3], origin[3];
+        // GetClientEyeAngles(attacker, eyeangles);
+        // GetAngleVectors(eyeangles, dir, NULL_VECTOR, NULL_VECTOR);
+        // // local vel = victim.GetAbsVelocity()
+        // GetEntPropVector(victim, Prop_Data, "m_vecVelocity", vel); 
+        // // dir.z = Max(dir.z, 0.0)
+        // dir[2] = BonkBat_Max(dir[2], 0.0);
+        // // vel += dir * scale
+        // ScaleVector(dir, scale);
+        
+        // float final_vel[3];
+        // AddVectors(vel, dir, final_vel);
+        // // vel.z += scale
+        // final_vel[2] += scale;
+        // // victim.SetAbsVelocity(vel)
+        // Custom_SetAbsVelocity(victim, vel);				
+        // // victim.EmitSound(bat_hit_sound)
+        // GetClientAbsOrigin(victim, origin);
         
         return Plugin_Changed;
     }
