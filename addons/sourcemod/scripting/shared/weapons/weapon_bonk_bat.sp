@@ -41,6 +41,8 @@ public Action BonkBat_OnTakeDamage(int victim, int &attacker, int &inflictor, fl
         
         damageForce[2] *= 450.0;
         
+        Attributes_Set(victim, Attrib_MultiplyFallDamage, 100.0);
+        
         return Plugin_Changed;
     }
     
