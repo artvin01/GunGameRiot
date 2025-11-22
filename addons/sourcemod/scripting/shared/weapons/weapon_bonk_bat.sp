@@ -30,8 +30,3 @@ public Action BonkBat_OnTakeDamage(int victim, int &attacker, int &inflictor, fl
     
     return Plugin_Continue;
 }
-
-public float BonkBat_Max(float f1, float f2)
-{
-    return f1 > f2 ? f1 : f2;
-}
