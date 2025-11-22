@@ -32,12 +32,12 @@ public Action BonkBat_OnTakeDamage(int victim, int &attacker, int &inflictor, fl
         float vel[3];
         GetEntPropVector(victim, Prop_Data, "m_vecAbsVelocity", vel);  
         
-        float scale = 1000.0;
+        float scale = 5000.0;
         
         ScaleVector(vel, scale);
         
         vel[2] = FloatAbs(vel[2]);
-        vel[2] += scale;
+        vel[2] += scale / 2.0;
         
         Custom_SetAbsVelocity(victim, vel);
     
