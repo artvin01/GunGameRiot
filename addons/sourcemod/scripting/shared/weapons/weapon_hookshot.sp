@@ -223,7 +223,7 @@ public void Hook_Fire(int client)
 	}
 	
 	Hook_NextUse[client] = GetGameTime() + Hook_CD[client];
-	EmitSoundToClient(client, HOOK_FIRE, _, _, 120);
+	EmitSoundToClient(client, HOOK_FIRE, _, _, 80);
 	Hook_Reeling[client] = true;
 	Hook_CurrentlyPulling[client] = false;
 }
@@ -240,7 +240,7 @@ void Hook_Disconnect(int client, bool early)
 
 	if (Hook_Reeling[client])
 	{
-		EmitSoundToClient(client, HOOK_DETACH, _, _, 120);
+		EmitSoundToClient(client, HOOK_DETACH, _, _, 80);
 	}
 
 	Hook_Reeling[client] = false;
@@ -459,19 +459,19 @@ public Action Hook_Touch(int hook, int other)
 
 		if (IsValidMulti(other, false, _))
 		{
-			EmitSoundToClient(client, HOOK_CONTACT_ENEMY, _, _, 120);
-			EmitSoundToClient(other, HOOK_CONTACT_ENEMY, _, _, 120);
+			EmitSoundToClient(client, HOOK_CONTACT_ENEMY, _, _, 80);
+			EmitSoundToClient(other, HOOK_CONTACT_ENEMY, _, _, 80);
 			SDKHooks_TakeDamage(other, hook, client, Hook_DMG[client]);
 			//PlayRandomSound(client, "sound_hook_attach_player", client);
 			Hook_Victim[client] = other;
 		}
 		else
 		{
-			EmitSoundToClient(client, HOOK_CONTACT_SURFACE, _, _, 120);
+			EmitSoundToClient(client, HOOK_CONTACT_SURFACE, _, _, 80);
 			//PlayRandomSound(client, "sound_hook_attach", client);
 		}
 			
-		EmitSoundToClient(client, HOOK_REEL, _, _, 120);
+		EmitSoundToClient(client, HOOK_REEL, _, _, 80);
 		Hook_DetatchGameTime[client] = GetGameTime() + Hook_DetatchTime[client];
 		HS_LastCheckAt[client] = GetEngineTime();
 			
