@@ -50,12 +50,18 @@
 #define SOUND_LEVELUP "turbo_gungame/levelup.mp3"
 #define SOUND_FINALLEVEL "ui/duel_challenge_accepted_with_restriction.wav"
 
+enum struct SpawnPointInfo
+{
+	int ref;
+	TFTeam originalTeam;
+}
 
 #include "global_arrays.sp"
 #include "stocks_override.sp"
 #include "stocks.sp"
 #include "weapons.sp"
 #include "configs.sp"
+#include "console.sp"
 #include "viewchanges.sp"
 #include "attributes.sp"
 #include "sdkcalls.sp"
@@ -110,13 +116,15 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 }
 public void OnPluginStart()
 {
-	
 	Core_DoTickrateChanges();
 	DHook_Setup();
 	SDKCall_Setup();
 	Events_PluginStart();
 	SDKHook_PluginStart();
 	WandProjectile_GamedataInit();
+	Console_PluginStart();
+	
+	SpawnPointArray = new ArrayList(sizeof(SpawnPointInfo));
 	
 	RegAdminCmd("sm_give_gun", Command_ForceGiveGunName, ADMFLAG_ROOT, "Give a gun to a person");
 	
@@ -205,7 +213,10 @@ public void OnMapStart()
 	HookshotMapStart();
 	Spell_MapStart();
 	Redeemer_Precache();
+	
+	SpawnPointArray.Clear();
 }
+
 public void OnConfigsExecuted()
 {
 	ConVar_ConfigsExecuted();
@@ -223,14 +234,16 @@ public void OnConfigsExecuted()
 public void OnPluginEnd()
 {
 	ConVar_Disable();
-	
+	SetMapSpawnPointsToTeam(TFTeam_Unassigned, false);
 }
+
 public void OnClientPutInServer(int client)
 {
 	Core_DoTickrateChanges();
 	
 	SDKHook_HookClient(client);
 	ValidTargetToHit[client] = true;
+	ClientFirstTimeChoosingTeam[client] = true;
 }
 public void OnGameFrame()
 {
@@ -238,6 +251,13 @@ public void OnGameFrame()
 }
 public void OnEntityCreated(int entity, const char[] classname)
 {
+	if(!StrContains(classname, "info_player_teamspawn"))
+	{
+		// This is a non-networked entity, we're directly looking at its ref
+		RequestFrame(Frame_SpawnPointCreated, entity);
+		return;
+	}
+	
 	if (entity < 0)
 		return;
 	if (entity > 2048)
@@ -291,6 +311,73 @@ public void OnEntityCreated(int entity, const char[] classname)
 	else if(!StrContains(classname, "obj_"))
 	{
 		ValidTargetToHit[entity] = true;
+	}
+}
+
+void Frame_SpawnPointCreated(int entity)
+{
+	// Spawn points are created when a game (not round) starts in some maps, so we clean up the list if more spawns were added at a later point (because why would a map do this mid round)
+	// Needs to be a frame late because m_iTeamNum isn't initialized even in SDKHook_OnSpawnPost
+	// This is only used to store info about spawn points
+	
+	float time = GetGameTime();
+	static float lastTime;
+	
+	if (time != lastTime)
+		SpawnPointArray.Clear();
+	
+	TFTeam team = view_as<TFTeam>(GetEntProp(entity, Prop_Send, "m_iTeamNum"));
+	
+	SpawnPointInfo info;
+	info.ref = entity;
+	info.originalTeam = team;
+	SpawnPointArray.PushArray(info);
+	lastTime = time;
+}
+
+void Frame_SetMapSpawnPointsPostTeamSwitch(TFTeam team)
+{
+	SetMapSpawnPointsToTeam(team, true);
+}
+
+void SetMapSpawnPointsToTeam(TFTeam team, bool respawn)
+{
+	n_ForcedTeam = team;
+	
+	int length = SpawnPointArray.Length;
+	for (int i = length - 1; i >= 0; i--)
+	{
+		SpawnPointInfo info;
+		SpawnPointArray.GetArray(i, info);
+		
+		int entity = info.ref;
+		if (!IsValidEntity(entity))
+		{
+			SpawnPointArray.Erase(i);
+			continue;
+		}
+		
+		// Setting the team to unassigned/spectator restores the spawn point's original team
+		SetVariantInt(team <= TFTeam_Spectator ? view_as<int>(info.originalTeam) : view_as<int>(team));
+		AcceptEntityInput(entity, "SetTeam");
+	}
+	
+	if (respawn)
+	{
+		for (int client = 1; client <= MaxClients; client++)
+		{
+			if (!IsClientInGame(client) || !IsPlayerAlive(client) || TF2_GetClientTeam(client) <= TFTeam_Spectator)
+				continue;
+			
+			TFTeam playerTeam = TF2_GetClientTeam(client);
+			if (playerTeam <= TFTeam_Spectator)
+				continue;
+			
+			if (playerTeam != team)
+				TF2_ForceTeamJoin(client, team, false);
+			
+			RequestFrame(Frame_RespawnPlayer, GetClientUserId(client));
+		}
 	}
 }
 

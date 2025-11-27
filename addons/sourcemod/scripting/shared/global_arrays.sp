@@ -21,8 +21,6 @@ Handle g_hSDKWorldSpaceCenter;
 DynamicHook HookItemIterateAttribute;
 Handle g_hImpulse;
 ArrayList RawEntityHooks;
-ConVar sv_cheats;
-ConVar mp_friendlyfire;
 int m_bOnlyIterateItemViewAttributes;
 int m_Item;
 //bool IsInsideManageRegularWeapons;
@@ -30,9 +28,13 @@ int iref_PropAppliedToRocket[MAXENTITIES];
 float f_RoundStartUberLastsUntil;
 bool b_DisableCollisionOnRoundStart;
 bool b_IsAProjectile[MAXENTITIES];
+ArrayList SpawnPointArray;
+TFTeam n_ForcedTeam;
 
+ConVar sv_cheats;
+ConVar mp_friendlyfire;
 ConVar tf_scout_air_dash_count;
-
+ConVar mp_humans_must_join_team;
 
 int i_WeaponVMTExtraSetting[MAXENTITIES];
 bool b_IsATrigger[MAXENTITIES];
@@ -86,3 +88,4 @@ bool i_HasBeenHeadShotted[MAXPLAYERS];
 int ClientAtWhatScore[MAXPLAYERS];
 int ClientAssistsThisLevel[MAXPLAYERS];
 int ClientKillsThisFrame[MAXPLAYERS];
+int ClientFirstTimeChoosingTeam[MAXPLAYERS];

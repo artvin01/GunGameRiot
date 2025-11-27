@@ -108,8 +108,12 @@ enum g_Collision_Group
 	
 };
 
-
-
+// m_lifeState values
+#define LIFE_ALIVE				0 // alive
+#define LIFE_DYING				1 // playing death animation or still falling off of a ledge waiting to hit ground
+#define LIFE_DEAD				2 // dead. lying still.
+#define LIFE_RESPAWNABLE		3
+#define LIFE_DISCARDBODY		4
 
 stock int TF2_GetClassnameSlot(const char[] classname, int entity = -1)
 {
@@ -1491,4 +1495,28 @@ stock void ModelIndexToString(int index, char[] model, int size)
 stock float getLinearVelocity(float vecVelocity[3])
 {
 	return SquareRoot((vecVelocity[0] * vecVelocity[0]) + (vecVelocity[1] * vecVelocity[1]) + (vecVelocity[2] * vecVelocity[2]));
+}
+
+void TF2_ForceTeamJoin(int client, TFTeam team, bool respawn)
+{
+	bool alive = IsPlayerAlive(client);
+	if (alive)
+		SetEntProp(client, Prop_Send, "m_lifeState", LIFE_DEAD);
+	
+	TF2_ChangeClientTeam(client, team);
+	
+	if (alive)
+		SetEntProp(client, Prop_Send, "m_lifeState", LIFE_ALIVE);
+	
+	if (respawn)
+		TF2_RespawnPlayer(client);
+}
+
+void Frame_RespawnPlayer(int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if (client <= 0)
+		return;
+	
+	TF2_RespawnPlayer(client);
 }
