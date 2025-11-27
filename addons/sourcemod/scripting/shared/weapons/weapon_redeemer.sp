@@ -35,7 +35,7 @@ public void Weapon_Redeemer(int client, int weapon, bool crit)
 	CreateDataTimer(20.0, Timer_RemoveEntity_Redeemer, packremove, TIMER_FLAG_NO_MAPCHANGE);
 	packremove.WriteCell(EntIndexToEntRef(projectile));
 
-	EmitSoundToAll(g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], projectile, SNDCHAN_STATIC, 80, _, 1.0, 100);
+	EmitSoundToClient(client, g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], projectile, SNDCHAN_STATIC, 80, _, 1.0, 100);
 	Custom_SDKCall_SetLocalOrigin(Spectator, {-45.0,0.0,5.0});	
 	WandProjectile_ApplyFunctionToEntity(projectile, RedeemerTouch);
 	PlayerToRocket[client] = EntIndexToEntRef(projectile);
@@ -55,8 +55,12 @@ public Action Timer_RemoveEntity_Redeemer(Handle timer, DataPack pack)
 	int Projectile = EntRefToEntIndex(pack.ReadCell());
 	if(IsValidEntity(Projectile) && Projectile>MaxClients)
 	{
-		EmitSoundToAll(g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], Projectile, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
-		EmitSoundToAll(g_CritBoost[GetRandomInt(0, sizeof(g_CritBoost) - 1)], Projectile, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
+		int owner = EntRefToEntIndex(i_WandOwner[Projectile]);
+		if(IsValidClient(owner))
+		{
+			EmitSoundToClient(owner, g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], Projectile, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
+			EmitSoundToClient(owner, g_CritBoost[GetRandomInt(0, sizeof(g_CritBoost) - 1)], Projectile, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
+		}
 		RemoveEntity(Projectile);
 	}
 
@@ -121,7 +125,7 @@ static Action Timer_Local(Handle timer, DataPack pack)
 		float fVel[3];
 
 		PrintCenterText(client, "Control your rocket with your mouse!\nThe more it flies, the more damage it will deal.");
-        SetEntProp(client, Prop_Send, "m_hObserverTarget", -1);
+		SetEntProp(client, Prop_Send, "m_hObserverTarget", -1);
 		GetEntPropVector(rocket, Prop_Data, "m_vInitialVelocity", fVel);
 		float speed = getLinearVelocity(fVel);
 		if(speed < 1500.0)
@@ -135,9 +139,9 @@ static Action Timer_Local(Handle timer, DataPack pack)
 					RemoveEntity(particle);
 
 							
-				EmitSoundToAll(g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], rocket, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
-				EmitSoundToAll(g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], rocket, SNDCHAN_STATIC, 80, _, 1.0, 80);
-				EmitSoundToAll(g_CritBoost[GetRandomInt(0, sizeof(g_CritBoost) - 1)], rocket, SNDCHAN_STATIC, 80, _, 1.0, 100);
+				EmitSoundToClient(client,g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], rocket, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
+				EmitSoundToClient(client,g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], rocket, SNDCHAN_STATIC, 80, _, 1.0, 80);
+				EmitSoundToClient(client,g_CritBoost[GetRandomInt(0, sizeof(g_CritBoost) - 1)], rocket, SNDCHAN_STATIC, 80, _, 1.0, 100);
 
 				float vAbsorigin[3];
 				GetAbsOrigin(rocket, vAbsorigin);
@@ -162,8 +166,14 @@ public void RedeemerTouch(int entity, int target)
 {
 	if (target >= 0)	
 	{
-		EmitSoundToAll(g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], entity, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
-		EmitSoundToAll(g_CritBoost[GetRandomInt(0, sizeof(g_CritBoost) - 1)], entity, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
+		int owner = EntRefToEntIndex(i_WandOwner[entity]);
+		if(!IsValidClient(owner))
+		{
+			RemoveEntity(entity);
+			return;
+		}
+		EmitSoundToClient(owner, g_Boowomp[GetRandomInt(0, sizeof(g_Boowomp) - 1)], entity, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
+		EmitSoundToClient(owner,g_CritBoost[GetRandomInt(0, sizeof(g_CritBoost) - 1)], entity, SNDCHAN_STATIC, 80, SND_STOP, 1.0, 100);
 		int particle = EntRefToEntIndex(i_WandParticle[entity]);
 		//Code to do damage position and ragdolls
 		static float angles[3];
@@ -173,7 +183,6 @@ public void RedeemerTouch(int entity, int target)
 		static float Entity_Position[3];
 		WorldSpaceCenter(entity, Entity_Position);
 
-		int owner = EntRefToEntIndex(i_WandOwner[entity]);
 
 		if(f_WandDamage[entity] < 500.0)
 		{
