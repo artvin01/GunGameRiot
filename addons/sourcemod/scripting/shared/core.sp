@@ -98,6 +98,7 @@ enum struct SpawnPointInfo
 #include "weapons/weapon_poisoned_sandvich.sp"
 #include "weapons/weapon_hookshot.sp"
 #include "weapons/weapon_redeemer.sp"
+#include "weapons/weapon_barracks.sp"
 
 public Plugin myinfo =
 {
